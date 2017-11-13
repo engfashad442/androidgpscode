@@ -1,0 +1,114 @@
+package com.example.shuaibfawole.findyourlocation;
+
+import android.content.Context;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.TextView;
+
+
+public class MainActivity extends AppCompatActivity  implements LocationListener{
+    //Declaring the required properties
+    private TextView Lat;
+    private  TextView longt;
+    private  TextView Source;
+    private LocationManager locationManager;
+    private  String provider;
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+        //Making Reference to the widgets on the activity
+        Lat = (TextView)findViewById(R.id.latitude);
+        longt = (TextView) findViewById(R.id.logititude);
+        Source = (TextView) findViewById(R.id.source);
+        //initialize the location manager
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        Criteria  criteria = new Criteria();
+        provider =  locationManager.getBestProvider(criteria,false);
+        Location location = locationManager.getLastKnownLocation(provider);
+        if(location != null){
+            Source.setText("Source = " +provider);
+            onLocationChanged(location);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        locationManager.requestLocationUpdates(provider,50,1,this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        locationManager.removeUpdates(this);
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+         double latt = location.getLatitude();
+         double longtt = location.getLongitude();
+        Lat.setText(String.valueOf(latt));
+        longt.setText(String.valueOf(longtt));
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+       Source.setText("Source "  + provider);
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+        Source.setText("Source "  + provider);
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        Source.setText("Source "  + provider);
+    }
+}
